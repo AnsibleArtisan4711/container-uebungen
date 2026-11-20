@@ -1,0 +1,47 @@
+
+## 1. Deployment und Service anwenden; der Dienst wählt Pods über Labels
+$ kubernetes-validate -k 1.31 --strict app.yaml
+OK: app.yaml passed for resource deployment/web
+OK: app.yaml passed for resource service/web
+$ k8ssim apply -f app.yaml
+deployment.apps/web created
+service/web created
+$ k8ssim get svc
+NAME  TYPE       CLUSTER-IP    PORT(S)
+web   ClusterIP  10.96.139.68  80/TCP
+$ k8ssim get endpoints
+NAME  ENDPOINTS
+web   10.244.3.148:8080,10.244.2.145:8080,10.244.3.136:8080
+
+## 2. Anfragen an den Dienst werden reihum auf die Pods verteilt
+Antwort von web-<Hash>-103cd
+Antwort von web-<Hash>-428db
+Antwort von web-<Hash>-848d0
+Antwort von web-<Hash>-103cd
+
+## 3. Ein Pod fällt aus: der Endpunkt verschwindet, ein neuer kommt hinzu
+$ k8ssim get endpoints
+NAME  ENDPOINTS
+web   <IP>:8080
+
+## 4. Fehler: Selector passt zu keinem Pod (Tippfehler im Label)
+$ kubernetes-validate -k 1.31 --strict falsch.yaml
+OK: falsch.yaml passed for resource service/falsch
+$ k8ssim apply -f falsch.yaml
+service/falsch created
+$ k8ssim get endpoints
+NAME    ENDPOINTS
+falsch  <none>
+web     10.244.3.136:8080
+$ k8ssim curl falsch
+curl: Connection refused (Service falsch hat keine Endpunkte)
+Der Dienst existiert und ist gültig, hat aber keine Endpunkte: Die Prüfung des Schemas findet diesen Fehler nicht.
+
+## 5. Dienst, der nicht existiert
+$ k8ssim curl gibtsnicht
+curl: Could not resolve host: gibtsnicht
+
+## 6. Dienst-Typen im Schema (nur Prüfung): ClusterIP ohne Adresse (Headless) und NodePort
+$ kubernetes-validate -k 1.31 --strict typen.yaml
+OK: typen.yaml passed for resource service/headless
+OK: typen.yaml passed for resource service/extern

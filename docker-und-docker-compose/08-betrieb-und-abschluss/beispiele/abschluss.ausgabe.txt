@@ -1,0 +1,18 @@
+
+## 1. Starten und prüfen
+schreiber: running ()
+web: running (healthy)
+Notiz 1
+
+## 2. Sicherung des Volumes
+./ ./index.html 
+
+## 3. Datenverlust: Projekt samt Volume entfernen
+Dienst antwortet nicht mehr
+
+## 4. Wiederherstellung: Volume anlegen, Daten einspielen, Dienst starten (ohne den Schreiber)
+Notiz 1
+
+## 5. Abnahme
+web: read-only=true, cap_drop=[ALL]
+web: running (healthy)

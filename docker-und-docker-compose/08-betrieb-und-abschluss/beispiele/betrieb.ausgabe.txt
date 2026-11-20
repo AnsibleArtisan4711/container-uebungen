@@ -1,0 +1,26 @@
+
+## 1. Belegung ansehen (system df) und Reste erzeugen
+rest1: exited
+rest2: exited
+rest3: exited
+Arten in system df: Images Containers Local Volumes Build Cache 
+
+## 2. Aufräumen: prune entfernt nur Ungenutztes
+Container übrig: 0
+Volumes übrig nach prune (nur anonyme werden entfernt): 1
+Volumes übrig nach prune --all: 0
+
+## 3. Daten eines Volumes sichern (tar im Container)
+daten.tgz
+./ ./a.txt ./b.txt ./sub/ ./sub/c.txt 
+Prüfsumme vorher: a4c4a879b41267e433812daa4af9efa7
+
+## 4. Datenverlust und Wiederherstellung in ein neues Volume
+Volume daten gelöscht
+Prüfsumme nachher: a4c4a879b41267e433812daa4af9efa7
+tief
+
+## 5. Neustartrichtlinie und Selbstheilung
+Neustarts: 2, Zustand: exited, Richtlinie: on-failure:2
+Nicht ausgeführt: Sicherung auf einen anderen Rechner, Verschlüsselung der Sicherung, automatischer Zeitplan (cron, systemd-Timer),
+Überwachung der Container. Ein Volume im selben Rechner ist keine Sicherung (3-2-1-Regel: siehe Backup-Kurse).

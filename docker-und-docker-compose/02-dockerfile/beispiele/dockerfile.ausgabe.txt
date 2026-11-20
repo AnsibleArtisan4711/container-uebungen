@@ -1,0 +1,44 @@
+
+## 1. Dockerfile bauen und starten
+Bau erfolgreich
+Version 1
+
+## 2. ENTRYPOINT bleibt, CMD wird ersetzt
+gebaut mit Stand 1
+
+## 3. .dockerignore: secret.txt liegt nicht im Image
+Dockerfile
+build.txt
+version.txt
+
+## 4. Schichten (history) und Anzahl der Dateisystemschichten
+1: CMD ["/app/version.txt"]
+2: ENTRYPOINT ["cat"]
+3: EXPOSE [8080/tcp]
+4: USER 1000
+5: RUN /bin/sh -c echo "gebaut mit Stand $STAND" > /app/build.txt
+6: COPY . /app
+7: WORKDIR /app
+8: ENV APP_NAME=demo STAND=1
+9: ARG STAND=1
+Schichten: 4
+
+## 5. Cache: unveränderter Bau, dann Datei geändert (Zustand je Schritt)
+unverändert:
+[2/4] WORKDIR /app: aus dem Cache
+[3/4] COPY . /app: aus dem Cache
+[4/4] RUN echo "gebaut mit Stand 1" > /app/build.txt: aus dem Cache
+nach Änderung von version.txt:
+[2/4] WORKDIR /app: aus dem Cache
+[3/4] COPY . /app: neu gebaut
+[4/4] RUN echo "gebaut mit Stand 1" > /app/build.txt: neu gebaut
+Version 2
+
+## 6. ARG: Wert beim Bauen setzen, ENV: Wert im Image
+STAND=7 APP_NAME=demo
+gebaut mit Stand 7
+1000
+
+## 7. Mehrstufiger Bau: Werkzeuge bleiben in der Bauphase
+fertiges Ergebnis
+/bauwerkzeug.txt: No such file or directory

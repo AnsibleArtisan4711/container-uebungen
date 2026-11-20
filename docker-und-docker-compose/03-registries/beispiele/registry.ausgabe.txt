@@ -1,0 +1,27 @@
+
+## 1. Die Registry antwortet (Registry-API v2)
+GET /v2/ -> HTTP 200
+{"repositories":[]}
+
+
+## 2. Namen: Registry/Pfad:Tag, taggen und hochladen (push)
+1.0: digest: sha256:<Prüfsumme> size: <Größe>
+
+## 3. Katalog und Tags abfragen
+{"repositories":["p25/basis"]}
+
+{"name":"p25/basis","tags":["latest","1.0"]}
+
+
+## 4. Lokal löschen und wieder holen (pull)
+Lokale Images mit diesem Namen: 0
+localhost:5000/p25/basis:1.0
+Container aus dem geholten Image
+
+## 5. Digest: unveränderlicher Verweis (statt des beweglichen Tags)
+localhost:5000/p25/basis:1.0 @ sha256:<Prüfsumme>
+
+## 6. Nicht vorhandenes Image
+failed to resolve reference "localhost:5000/p25/gibtsnicht:1": localhost:5000/p25/gibtsnicht:1: not found
+Nicht geprüft: Docker Hub und andere Internet-Registries (im Container nicht erreichbar), Anmeldung mit docker login, TLS und Benutzerverwaltung
+der Registry. Eine Registry ohne TLS und Anmeldung ist nur für localhost und das Übungslabor geeignet (Fachwissen).

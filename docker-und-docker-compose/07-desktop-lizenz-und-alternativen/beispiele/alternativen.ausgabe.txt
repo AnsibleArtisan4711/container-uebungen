@@ -1,0 +1,30 @@
+
+## 1. Docker Engine unter Linux: Daemon, Kontext, Betriebssystem
+default: unix:///var/run/docker.sock
+Server: 29.9.2, Betriebssystem: Ubuntu 24.04.5 LTS
+
+## 2. Was auf diesem Rechner installiert ist (Docker Desktop ist es nicht)
+docker: vorhanden
+docker-compose: nicht vorhanden
+dockerd: vorhanden
+podman: vorhanden
+buildah: vorhanden
+skopeo: vorhanden
+dockerd-rootless-setuptool.sh: nicht vorhanden
+Compose-Plugin: 5.7.0
+
+## 3. Dasselbe Image mit Podman starten (Image per save/load aus Docker übernommen)
+geladen: Loaded image: docker.io/p25/busybox:lab
+hallo von Podman
+podman version 4.9.3
+
+## 4. Gleiche Befehle, gleiche Compose-Datei?
+a
+podman compose: Befehl vorhanden (der Provider dahinter wurde nicht geprüft)
+
+## 5. Lizenzstand Docker Desktop (Quelle: docs.docker.com, Abruf 20.11.2026; die Seite nennt als Aktualisierung 28.09.2026)
+Kostenlos: kleine Unternehmen (weniger als 250 Beschäftigte und weniger als 10 Mio. USD Jahresumsatz), persönlicher Gebrauch, Ausbildung,
+nichtkommerzielle Open-Source-Projekte. Berufliche Nutzung in größeren Organisationen und in Behörden: kostenpflichtiges Abonnement (Pro, Team, Business).
+Das ist die Zusammenfassung einer Seite des Herstellers; der Wortlaut der Bedingungen wurde nicht gelesen. Vor dem Einsatz die Originalseite lesen.
+Docker Engine unter Linux (docker-ce) ist nicht Docker Desktop; deren Lizenz wurde nicht geprüft.
+Nicht geprüft: Docker Desktop selbst (nur Windows und macOS, hier nicht installiert), Rootless-Docker, Rancher Desktop, Colima.

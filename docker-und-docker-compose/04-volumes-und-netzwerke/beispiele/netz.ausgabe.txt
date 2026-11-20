@@ -1,0 +1,25 @@
+
+## 1. Benanntes Volume: Daten überleben den Container
+gespeichert
+Volume: daten (local)
+
+## 2. Ohne Volume ist die beschreibbare Schicht weg
+/nur-im-container: No such file or directory
+
+## 3. Bind-Mount (Ordner des Hosts) und tmpfs (Arbeitsspeicher)
+Startseite
+can't create /www/neu: Read-only file system
+flüchtig
+tmpfs tmpfs
+
+## 4. Standard-Bridge: keine Namensauflösung, eigenes Netz: Name = Adresse
+Startseite
+bad address 'web0'
+
+## 5. Port veröffentlichen (-p) und von außen abrufen
+80/tcp -> 0.0.0.0:18025
+Startseite
+
+## 6. Netz ansehen und Container ohne Netz
+bridge, Container im Netz: 1
+lo 

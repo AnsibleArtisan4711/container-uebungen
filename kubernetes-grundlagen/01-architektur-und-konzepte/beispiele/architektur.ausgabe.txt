@@ -1,0 +1,32 @@
+
+## 1. Bausteine (Fachwissen, nicht gegen die Dokumentation geprüft)
+Control Plane: kube-apiserver (einzige Schnittstelle), etcd (Zustandsspeicher), kube-scheduler (wählt den Knoten), kube-controller-manager (gleicht Soll und Ist ab).
+Knoten: kubelet (startet Pods), Container-Runtime (z. B. containerd), kube-proxy (Dienste im Netz).
+Grundidee: Man beschreibt den Soll-Zustand (Manifest); Controller stellen ihn her und halten ihn.
+
+## 2. Ein Modell-Cluster mit drei Knoten
+$ k8ssim init
+Modell-Cluster mit 3 Knoten angelegt (je 2 CPU, 4096 MiB); Namespaces: default, kube-system
+$ k8ssim get nodes
+NAME  STATUS  ROLES
+cp1   Ready   control-plane
+w1    Ready   worker
+w2    Ready   worker
+$ k8ssim get ns
+default
+kube-system
+
+## 3. Echt: Ein Pod teilt sich das Netz. Zwei Container, ein Netz-Namespace (mit Docker nachgestellt)
+Antwort des Web-Containers
+Netzmodus von pod-web: container:<ID von pod-pause> (benutzt das Netz von pod-pause)
+
+## 4. Echt: Ein einfaches Pod-Manifest gegen das Schema prüfen
+$ kubernetes-validate -k 1.31 --strict pod.yaml
+OK: pod.yaml passed for resource pod/hallo
+$ kubernetes-validate -k 1.31 --strict pod-fehler.yaml
+ERROR pod-fehler.yaml did not validate for resource pod/hallo: spec: 'containers' is a required property
+
+## 5. Deklarativ: dieselbe Datei zweimal anwenden (Modell)
+$ k8ssim apply -f pod.yaml
+pod/hallo created
+Hinweis: Das Modell kennt Pods nur als Teil von Deployments; ein einzelner Pod wird hier nur geprüft, nicht gestartet.

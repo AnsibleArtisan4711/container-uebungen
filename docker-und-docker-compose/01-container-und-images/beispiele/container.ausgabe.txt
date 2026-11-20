@@ -1,0 +1,34 @@
+
+## 1. Versionen (Client und Server)
+Client 29.9.2, Server 29.9.2
+
+## 2. Ein Container ist ein isolierter Prozess: eigener Rechnername, eigene Prozessliste
+Befehl: hallo aus dem Container
+PID der Shell: 1
+Rechnername im Container ist ein anderer als auf dem Host: ja
+
+## 3. Lebenslauf: create, start, ps, stop, rm (Zustand je Schritt)
+web1: created
+web1: running
+
+## 4. Ausgabe lesen (logs) und Befehl im laufenden Container ausführen (exec)
+hallo-log
+bin dev etc proc sys 
+
+## 5. Der Container im Host: eigene Namespaces, eigene cgroup
+Namespace pid: eigener
+Namespace net: eigener
+Namespace mnt: eigener
+Namespace uts: eigener
+cgroup-Pfad enthält 'docker': ja
+
+## 6. Anhalten, Zustand, Exit-Code, Entfernen
+exited, Exit-Code 137
+fehler: exited, Exit-Code 3
+web1
+fehler
+Container mit Label p25 übrig: 0
+
+## 7. Image und Container sind verschieden
+Image p25/busybox:lab
+Ein Image ist die schreibgeschützte Vorlage; jeder Container bekommt darüber eine beschreibbare Schicht (Fachwissen).

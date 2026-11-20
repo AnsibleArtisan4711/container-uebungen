@@ -1,0 +1,65 @@
+
+## 1. Manifest prüfen (echt) und anwenden (Modell)
+$ kubernetes-validate -k 1.31 --strict web.yaml
+OK: web.yaml passed for resource deployment/web
+$ kubernetes-validate -k 1.31 --strict fehler.yaml
+ERROR fehler.yaml did not validate for resource deployment/web: spec.replicas: 'drei' is not of type 'integer', 'null'
+$ k8ssim apply -f web.yaml
+deployment.apps/web created
+
+## 2. Deployment -> ReplicaSet -> Pods, verteilt auf die Arbeitsknoten (Control-Plane-Knoten nehmen keine Pods an)
+$ k8ssim get deploy
+NAME  READY  AVAILABLE  IMAGE
+web   3/3    3          nginx:1.26
+$ k8ssim get rs
+NAME            DESIRED  READY  REVISION
+web-2946ce178c  3        3      1
+$ k8ssim get pods
+NAME                  READY  STATUS   NODE
+web-2946ce178c-8ae09  1/1    Running  w1
+web-2946ce178c-ae845  1/1    Running  w1
+web-2946ce178c-dfb83  1/1    Running  w2
+
+## 3. Selbstheilung: Ein Pod wird gelöscht, der Controller erzeugt einen neuen
+gelöscht wird der erste Pod der Liste
+pod "<Name>" deleted
+$ k8ssim get deploy
+NAME  READY  AVAILABLE  IMAGE
+web   3/3    3          nginx:1.26
+
+## 4. Skalieren: von 3 auf 5 und zurück auf 2
+$ k8ssim scale deploy/web --replicas=5
+deployment.apps/web scaled
+$ k8ssim get deploy
+NAME  READY  AVAILABLE  IMAGE
+web   5/5    5          nginx:1.26
+$ k8ssim scale deploy/web --replicas=2
+deployment.apps/web scaled
+$ k8ssim get pods
+NAME                  READY  STATUS   NODE
+web-2946ce178c-dcf97  1/1    Running  w1
+web-2946ce178c-dfb83  1/1    Running  w2
+
+## 5. Knotenausfall: die Pods des Knotens werden auf dem anderen Knoten neu gestartet
+$ k8ssim node fail w1
+node/w1 ausgefallen (NotReady)
+$ k8ssim get pods
+NAME                  READY  STATUS   NODE
+web-2946ce178c-2c167  1/1    Running  w2
+web-2946ce178c-dfb83  1/1    Running  w2
+web-2946ce178c-ee78a  1/1    Running  w2
+$ k8ssim node recover w1
+node/w1 wieder Ready
+
+## 6. Ressourcenanforderung (requests) zu groß: der Pod bleibt Pending
+$ k8ssim apply -f gross.yaml
+deployment.apps/gross created
+$ k8ssim get pods -l app=gross
+NAME                    READY  STATUS         NODE
+gross-958d06de44-0097b  0/1    Unschedulable  <none>
+$ k8ssim describe gross-<Hash>-<Id>
+Name: gross-<Hash>-<Id>
+Node: <none>
+Status: Unschedulable
+Events:
+  Warning FailedScheduling 0/3 nodes are available: 3 Insufficient cpu.

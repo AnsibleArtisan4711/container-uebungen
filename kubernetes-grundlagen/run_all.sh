@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Führt alle Modulskripte aus und schreibt die Ausgaben nach NN-name/beispiele/SKRIPT.ausgabe.txt.
+# Braucht python3 mit PyYAML und kubernetes-validate (pip), für Modul 1 und 8 zusätzlich Docker und busybox-static, siehe README. Dateien unter /tmp/p26.
+cd "$(dirname "$0")" || exit 1
+for d in [0-9][0-9]-*/; do
+  for s in "$d"*.sh; do
+    [ -f "$s" ] || continue
+    b=$(basename "$s" .sh); mkdir -p "${d}beispiele"
+    bash "$s" 2>&1 > "${d}beispiele/$b.ausgabe.txt"
+    echo "$s -> $(wc -l < "${d}beispiele/$b.ausgabe.txt") Zeilen"
+  done
+done

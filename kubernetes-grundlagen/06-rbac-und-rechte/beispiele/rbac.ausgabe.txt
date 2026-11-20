@@ -1,0 +1,38 @@
+
+## 1. Rollen und Bindungen prüfen (echt) und anwenden (Modell)
+$ kubernetes-validate -k 1.31 --strict rbac.yaml
+OK: rbac.yaml passed for resource serviceaccount/app
+OK: rbac.yaml passed for resource role/pod-leser
+OK: rbac.yaml passed for resource rolebinding/alice-liest
+OK: rbac.yaml passed for resource clusterrole/knoten-leser
+OK: rbac.yaml passed for resource clusterrolebinding/bob-knoten
+$ k8ssim apply -f rbac.yaml
+serviceaccount/app created
+role.rbac.authorization.k8s.io/pod-leser created
+rolebinding.rbac.authorization.k8s.io/alice-liest created
+clusterrole.rbac.authorization.k8s.io/knoten-leser created
+clusterrolebinding.rbac.authorization.k8s.io/bob-knoten created
+
+## 2. Wer darf was? (Modell). Ohne Regel gilt: nein
+$ k8ssim can-i get pods --as alice -n dev
+yes
+$ k8ssim can-i list pods --as alice -n dev
+yes
+$ k8ssim can-i delete pods --as alice -n dev
+no
+$ k8ssim can-i get secrets --as alice -n dev
+no
+$ k8ssim can-i get pods --as alice -n prod
+no
+$ k8ssim can-i get pods --as bob -n dev
+no
+$ k8ssim can-i get nodes --as bob
+yes
+$ k8ssim can-i get nodes --as alice
+no
+
+## 3. Was das Schema findet und was nicht (echt geprüft)
+OK: fehler.yaml passed for resource clusterrolebinding/bob-knoten
+Der Tippfehler im Typ (Rol statt Role) fällt dem Schema NICHT auf; erst die Bindung im Betrieb würde ins Leere laufen.
+ERROR fehler2.yaml did not validate for resource role/pod-leser: rules.0.verbs: 'get' is not of type 'array'
+Nicht ausgeführt: echte Authentifizierung (Zertifikate, Token), Aggregierte Rollen, ServiceAccount-Token, Admission-Regeln.

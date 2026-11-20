@@ -1,0 +1,67 @@
+$ kubernetes-validate -k 1.31 --strict web.yaml
+OK: web.yaml passed for resource deployment/web
+$ k8ssim apply -f web.yaml
+deployment.apps/web created
+
+## 1. Rolling Update auf ein vorhandenes Image (Schritte des Modells; maxSurge und maxUnavailable je 25 %)
+$ k8ssim set-image deploy/web web=nginx:1.27
+Schritt 1: neues ReplicaSet 1, altes 2 (bereit: neu 1, alt 2)
+Schritt 2: neues ReplicaSet 3, altes 0 (bereit: neu 3, alt 0)
+Schritt 3: neues ReplicaSet 4, altes 0 (bereit: neu 4, alt 0)
+deployment.apps/web image updated
+$ k8ssim get rs
+NAME            DESIRED  READY  REVISION
+web-950d03cfd1  4        4      2
+web-b9888d9794  0        0      1
+$ k8ssim get deploy
+NAME  READY  AVAILABLE  IMAGE
+web   4/4    4          nginx:1.27
+
+## 2. Update auf ein Image, das es nicht gibt: der Rollout bleibt stehen, die alten Pods laufen weiter
+$ k8ssim set-image deploy/web web=nginx:doesnotexist
+Schritt 1: neues ReplicaSet 1, altes 3 (bereit: neu 0, alt 3)
+Schritt 2: neues ReplicaSet 2, altes 3 (bereit: neu 0, alt 3)
+Schritt 3: neues ReplicaSet 2, altes 3 (bereit: neu 0, alt 3)
+deployment.apps/web image updated
+$ k8ssim rollout status deploy/web
+Rollout von "web" nicht abgeschlossen: 0 von 4 neuen Pods bereit, 3 Pods insgesamt bereit
+$ k8ssim get pods
+NAME                  READY  STATUS            NODE
+web-<Hash>-<Id>       1/1    Running           w2
+web-<Hash>-<Id>       1/1    Running           w2
+web-<Hash>-<Id>       1/1    Running           w1
+web-<Hash>-<Id>       0/1    ImagePullBackOff  w1
+web-<Hash>-<Id>       0/1    ImagePullBackOff  w1
+
+## 3. Fehlersuche: Ereignisse des fehlerhaften Pods lesen
+Name: web-<Hash>-<Id>
+Node: w1
+Status: ImagePullBackOff
+Image: nginx:doesnotexist
+Events:
+  Normal Scheduled Successfully assigned default/web-<Hash>-<Id> to w1
+  Normal Pulling Pulling image "nginx:doesnotexist"
+  Warning Failed Failed to pull image "nginx:doesnotexist": not found
+  Warning Failed Error: ImagePullBackOff
+
+## 4. Rollback auf die vorige Version
+$ k8ssim rollout history deploy/web
+REVISION  IMAGE
+1         nginx:1.26
+2         nginx:1.27
+3         nginx:doesnotexist
+$ k8ssim rollout undo deploy/web
+Schritt 1: neues ReplicaSet 4, altes 0 (bereit: neu 4, alt 0)
+deployment.apps/web rolled back
+$ k8ssim rollout status deploy/web
+Rollout von "web" abgeschlossen: 4 von 4 neuen Pods bereit
+$ k8ssim rollout history deploy/web
+REVISION  IMAGE
+1         nginx:1.26
+3         nginx:doesnotexist
+4         nginx:1.27
+
+## 5. Abgleich: Soll und Ist
+$ k8ssim get deploy
+NAME  READY  AVAILABLE  IMAGE
+web   4/4    4          nginx:1.27

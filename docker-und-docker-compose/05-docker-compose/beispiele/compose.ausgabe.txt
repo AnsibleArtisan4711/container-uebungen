@@ -1,0 +1,25 @@
+
+## 1. Datei prüfen (config) und Dienste auflisten
+client
+web
+Datei gültig
+
+## 2. Starten (up -d) und Zustand
+client: running ()
+web: running (healthy)
+
+## 3. Abhängigkeit: client wartet, bis web gesund ist; Antwort des Clients
+Willkommen
+
+## 4. Befehl im Dienst (exec) und Umgebungsvariable mit Vorgabe
+GREETING=Hallo
+GREETING=Servus
+
+## 5. Netz und Container gehören zum Projekt p25
+Netz: p25_intern
+Container: p25-client-1
+Container: p25-web-1
+
+## 6. Beenden (down) entfernt Container und Netz
+Container übrig: 0
+Netze übrig: 0

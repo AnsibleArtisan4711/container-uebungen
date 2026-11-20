@@ -1,0 +1,27 @@
+
+## 1. Dieselbe Anwendung: Compose-Datei (echt geprüft) und Kubernetes-Manifest (echt geprüft)
+web
+Compose-Datei gültig
+$ kubernetes-validate -k 1.31 --strict shop.yaml
+OK: shop.yaml passed for resource deployment/web
+OK: shop.yaml passed for resource service/web
+compose.yaml: 7 Zeilen
+shop.yaml: 22 Zeilen
+
+## 2. Gegenüberstellung (Fachwissen, nicht gegen die Dokumentation geprüft)
+Compose                      Kubernetes
+Dienst (service)             Deployment + Service
+ports: "8080:80"             Service (NodePort/ClusterIP) und Ingress
+environment                  env, ConfigMap, Secret
+volumes                      Volume, PersistentVolumeClaim
+replicas (deploy)            replicas im Deployment, selbstheilend und knotenübergreifend
+ein Rechner                  mehrere Knoten, Planung durch den Scheduler
+Entscheidung: Ein Rechner und wenig Dienste: Compose genügt. Mehrere Knoten, Selbstheilung, Updates ohne Ausfall: Kubernetes.
+
+## 3. Selbstheilung: nur Kubernetes (Modell) gleicht Soll und Ist ständig ab
+$ k8ssim apply -f shop.yaml
+deployment.apps/web created
+service/web created
+$ k8ssim get deploy
+NAME  READY  AVAILABLE  IMAGE
+web   3/3    3          nginx:1.26

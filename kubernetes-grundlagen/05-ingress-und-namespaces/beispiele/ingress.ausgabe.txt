@@ -1,0 +1,50 @@
+
+## 1. Namespaces trennen Namen: derselbe Name in zwei Bereichen
+$ kubernetes-validate -k 1.31 --strict ns.yaml
+OK: ns.yaml passed for resource namespace/dev
+OK: ns.yaml passed for resource namespace/prod
+$ k8ssim apply -f ns.yaml
+namespace/dev created
+namespace/prod created
+$ k8ssim apply -f web-dev.yaml -n dev
+deployment.apps/web created
+service/web created
+$ k8ssim apply -f web-prod.yaml -n prod
+deployment.apps/web created
+service/web created
+$ k8ssim get deploy -n dev
+NAME  READY  AVAILABLE  IMAGE
+web   1/1    1          nginx:1.26
+$ k8ssim get deploy -n prod
+NAME  READY  AVAILABLE  IMAGE
+web   3/3    3          nginx:1.26
+$ k8ssim apply -f web-dev.yaml -n gibtsnicht
+Fehler: Namespace "gibtsnicht" nicht gefunden
+
+## 2. Ingress: Regeln für Host und Pfad
+$ kubernetes-validate -k 1.31 --strict ingress.yaml
+OK: ingress.yaml passed for resource ingress/shop
+$ k8ssim apply -f ingress.yaml -n prod
+ingress.networking.k8s.io/shop created
+
+## 3. Anfragen auflösen (Modell: längster passender Pfad gewinnt)
+$ k8ssim route shop.example.com /
+shop.example.com/ -> Ingress shop -> Dienst prod/web (Port 80)
+$ k8ssim route shop.example.com /api/benutzer
+shop.example.com/api/benutzer -> Ingress shop -> Dienst prod/api (Port 80)
+$ k8ssim route shop.example.com /status
+shop.example.com/status -> Ingress shop -> Dienst prod/web (Port 80)
+$ k8ssim route shop.example.com /status/x
+shop.example.com/status/x -> Ingress shop -> Dienst prod/web (Port 80)
+$ k8ssim route anders.example.com /
+404 Not Found (keine Regel für anders.example.com/)
+
+## 4. Dienst fehlt
+$ k8ssim route shop.example.com /api
+503 Service Unavailable (Dienst api fehlt)
+
+## 5. Veraltete API-Version eines Ingress: Das Schema 1.31 kennt sie nicht mehr (echt geprüft)
+$ kubernetes-validate -k 1.31 --strict alt.yaml
+WARN alt.yaml Couldn't find schema for kind Ingress with api version extensions/v1beta1 for kubernetes version 1.31
+Rückgabewert: 0 (0 = Prüfung ohne Fehler, aber die Datei wurde nicht gegen ein Schema geprüft)
+Nicht ausgeführt: ein echter Ingress-Controller (z. B. nginx), TLS-Zertifikate und die Namensauflösung der Hosts.

@@ -1,0 +1,53 @@
+
+## 1. Manifeste prüfen (echt) und anwenden (Modell)
+$ kubernetes-validate -k 1.31 --strict shop.yaml app.yaml
+OK: shop.yaml passed for resource namespace/shop
+OK: app.yaml passed for resource configmap/shop-konfig
+OK: app.yaml passed for resource secret/shop-geheimnis
+OK: app.yaml passed for resource deployment/shop
+OK: app.yaml passed for resource service/shop
+OK: app.yaml passed for resource ingress/shop
+OK: app.yaml passed for resource role/betrieb
+OK: app.yaml passed for resource rolebinding/betrieb-bindung
+$ k8ssim apply -f shop.yaml
+namespace/shop created
+$ k8ssim apply -f app.yaml -n shop
+configmap/shop-konfig created
+secret/shop-geheimnis created
+deployment.apps/shop created
+service/shop created
+ingress.networking.k8s.io/shop created
+role.rbac.authorization.k8s.io/betrieb created
+rolebinding.rbac.authorization.k8s.io/betrieb-bindung created
+
+## 2. Zustand
+$ k8ssim get deploy -n shop
+NAME  READY  AVAILABLE  IMAGE
+shop  3/3    3          nginx:1.26
+$ k8ssim get endpoints -n shop
+NAME  ENDPOINTS
+shop  <IP>:8080,<IP>:8080,<IP>:8080
+shop.example.com/ -> Ingress shop -> Dienst shop/shop (Port 80)
+
+## 3. Update mit Fehler, Fehlersuche und Rollback
+$ k8ssim rollout status deploy/shop -n shop
+Rollout von "shop" nicht abgeschlossen: 0 von 3 neuen Pods bereit, 3 Pods insgesamt bereit
+$ k8ssim curl shop -n shop
+Antwort von shop-<Hash>-<Id>
+$ k8ssim rollout status deploy/shop -n shop
+Rollout von "shop" abgeschlossen: 3 von 3 neuen Pods bereit
+
+## 4. Abnahme
+$ k8ssim get deploy -n shop
+NAME  READY  AVAILABLE  IMAGE
+shop  3/3    3          nginx:1.26
+$ k8ssim get cm -n shop
+NAME         DATA
+shop-konfig  1
+$ k8ssim get secret -n shop
+NAME            TYPE    DATA
+shop-geheimnis  Opaque  1
+$ k8ssim can-i get pods --as carla -n shop
+yes
+$ k8ssim can-i delete pods --as carla -n shop
+no
