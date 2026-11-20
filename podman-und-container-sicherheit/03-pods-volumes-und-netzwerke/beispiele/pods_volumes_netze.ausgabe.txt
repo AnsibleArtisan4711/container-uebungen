@@ -1,0 +1,22 @@
+
+## 1. Pod: zwei Container teilen sich das Netzwerk (localhost)
+$ podman run --rm --pod pod1 --name client localhost/bb:1 wget -qO- http://localhost:8080/
+hallo
+pod1 Running Container: 2
+
+## 2. Volume: Daten überleben das Entfernen des Containers
+$ podman run --rm -v daten1:/daten localhost/bb:1 cat /daten/notiz.txt
+wichtig
+daten1 local
+
+## 3. Bind-Mount eines Verzeichnisses (nur lesen, :ro)
+$ podman run --rm -v /tmp/p53/host:/host:ro localhost/bb:1 cat /host/a.txt
+vom Host
+/host/neu: Read-only file system
+
+## 4. Eigenes Netzwerk: Container erreichen sich über den Namen
+$ podman run --rm --network lab localhost/bb:1 wget -qO- http://srv:8080/
+vom-srv
+lab bridge
+podman bridge
+podman-default-kube-network bridge

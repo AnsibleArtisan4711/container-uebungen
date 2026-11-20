@@ -1,0 +1,24 @@
+
+## 1. Probelauf des Generators (Version von Podman: 4.9.3)
+quadlet-generator: Loading source unit file <W>/q/lab.network
+quadlet-generator: Loading source unit file <W>/q/web.container
+quadlet-generator: Loading source unit file <W>/q/webdaten.volume
+---lab-network.service---
+---webdaten-volume.service---
+---web.service---
+
+## 2. Erzeugte Unit web.service (Auszug)
+Description=Beispiel-Webserver
+Requires=lab-network.service
+After=lab-network.service
+Requires=webdaten-volume.service
+After=webdaten-volume.service
+Restart=always
+Type=notify
+ExecStart=/usr/bin/podman run --name=systemd-%N --cidfile=%t/%N.cid --replace --rm --cgroups=split --network=systemd-lab --sdnotify=conmon -d -v systemd-webdaten:/www --publish 8080:8080 localhost/bb:1 httpd -f -p 8080 -h /www
+WantedBy=multi-user.target
+
+## 3. Erzeugte Unit webdaten-volume.service (Auszug)
+ExecStart=/usr/bin/podman volume create --ignore systemd-webdaten
+Type=oneshot
+RemainAfterExit=yes

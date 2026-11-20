@@ -1,0 +1,25 @@
+
+## 1. Image vorhanden (Name und Größe; Kennung und Alter ausgeblendet)
+localhost/bb:1 2.14 MB
+
+## 2. Einen Befehl im Container ausführen und den Container danach entfernen (--rm)
+$ podman run --rm localhost/bb:1 echo Hallo aus dem Container
+Hallo aus dem Container
+
+## 3. Dauerhaft laufender Container im Hintergrund (-d), Name, Liste
+web1 localhost/bb:1 Up ...
+
+## 4. Befehl in laufendem Container (exec) und Protokoll (logs)
+$ podman exec web1 hostname
+<ID>
+$ podman logs web1
+gestartet
+
+## 5. Container beenden, Exitcode, entfernen
+web1 Exited (137)
+ExitCode=137
+$ podman rm web1
+web1
+
+## 6. Exitcode eines Programms im Container wird weitergegeben
+Exitcode: 3

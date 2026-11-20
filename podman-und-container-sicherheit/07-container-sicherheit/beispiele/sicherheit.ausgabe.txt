@@ -1,0 +1,25 @@
+
+## 1. Capabilities: Standard und alle entfernt (CapEff als Hexzahl)
+Standard:       00000000800405fb
+--cap-drop=ALL: 0000000000000000
+
+## 2. Eine Capability gezielt entfernen: Ändern des Besitzers (chown) scheitert ohne CAP_CHOWN
+mit Standard-Capabilities: chown-ok 
+ohne CAP_CHOWN:            chown: /f: Operation not permitted 
+
+## 3. Dateisystem nur lesbar (--read-only)
+/x: Read-only file system
+
+## 4. Keine neuen Rechte (--security-opt no-new-privileges), Wert aus /proc/self/status
+Standard:        NoNewPrivs=0
+no-new-privs:    NoNewPrivs=1
+
+## 5. seccomp-Filter: Standardprofil gegen unconfined (Seccomp-Zeile aus /proc/self/status: 2 = Filter aktiv, 0 = aus)
+Standard:   Seccomp=2
+unconfined: Seccomp=0
+
+## 6. Als Nicht-root im Container laufen (--user)
+uid=1000 gid=1000 groups=1000
+
+## 7. Richtlinie für Image-Signaturen (/etc/containers/policy.json, Auszug)
+Standard: insecureAcceptAnything

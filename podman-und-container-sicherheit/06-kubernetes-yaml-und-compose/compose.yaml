@@ -1,0 +1,11 @@
+# Beispiel für Podman Compose bzw. "podman compose" (Textdatei, NICHT ausgeführt: podman-compose war im Test-Container nicht installiert)
+services:
+  web:
+    image: localhost/bb:1
+    command: httpd -f -p 8080 -h /www
+    ports:
+      - "8080:8080"
+    volumes:
+      - webdaten:/www
+volumes:
+  webdaten:

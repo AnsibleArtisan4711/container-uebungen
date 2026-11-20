@@ -1,0 +1,29 @@
+
+## 1. Mit Containerfile bauen und starten
+Exitcode build: 0
+$ podman run --rm localhost/app:1
+Version 1.0
+
+## 2. Ebenen (Schichten) und Befehle des Images (podman history, gekürzt)
+CMD ["cat", "/app/versio...
+/bin/sh -c echo "gebaut" > /app/status.txt
+ENV MELDUNG=hallo
+COPY file:<Hash>
+LABEL beschreibung="Beis...
+ADD file:<Hash>
+
+## 3. Eigenschaften lesen (inspect)
+Label=Beispiel-Image Cmd=[cat /app/version.txt]
+
+## 4. Dasselbe mit buildah: Container aus Image, Befehl ausführen, als neues Image sichern
+$ podman run --rm localhost/app:2 cat /datei.txt
+aus-buildah
+
+## 5. Mit skopeo ohne Registry in ein Verzeichnis bzw. OCI-Layout kopieren und lesen
+dir: Exitcode 0
+oci: Exitcode 0
+blobs
+index.json
+oci-layout
+OCI-Index: v1+json - Referenzname: eins
+Architektur: amd64 - Betriebssystem: linux - Ebenen (rootfs): 3

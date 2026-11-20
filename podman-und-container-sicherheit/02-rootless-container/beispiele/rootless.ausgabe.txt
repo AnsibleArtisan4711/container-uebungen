@@ -1,0 +1,20 @@
+
+## 1. Der Benutzer hat einen Bereich untergeordneter Nummern (/etc/subuid, Nummern ausgeblendet)
+rl1:<SUBUID>:65536 (Anzahl)
+
+## 2. Image für den Benutzer laden und Container starten (ohne Netzwerk)
+Loaded image: localhost/bb:1
+uid=0 gid=0
+
+## 3. Zuordnung der Benutzernummern (uid_map): Container-root ist auf dem Host der Benutzer
+         0      <UID>          1
+         1     <SUBUID>      65536
+
+## 4. Auf dem Host läuft der Prozess unter dem Benutzer, nicht unter root
+rl1
+
+## 5. Eigener Speicher des Benutzers (Pfad unter dem Home-Verzeichnis)
+~/.local/share/containers/storage
+
+## 6. Mit Netzwerk scheitert es im Container (kein /dev/net/tun für slirp4netns)
+Fehler von slirp4netns: open /dev/net/tun: Permission denied

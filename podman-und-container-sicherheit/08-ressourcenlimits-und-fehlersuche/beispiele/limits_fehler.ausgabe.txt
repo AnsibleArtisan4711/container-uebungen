@@ -1,0 +1,22 @@
+
+## 1. Speicherlimit: --memory 64m (Wert aus dem cgroup-Dateisystem im Container)
+67108864
+
+## 2. Prozesslimit: --pids-limit 10, danach schlägt das Starten weiterer Prozesse fehl
+sh: can't fork: Resource temporarily unavailable
+
+## 3. Speicherlimit überschritten: Container wird beendet (Exitcode 137); Podman meldet trotzdem OOMKilled=false (Beobachtung dieses Laufs)
+Exitcode: 137
+OOMKilled=false
+
+## 4. Typische Fehler
+Image nicht vorhanden:
+Error: localhost/gibtesnicht:1: image not known
+Befehl nicht gefunden:
+Error: runc: runc create failed: unable to start container process: error during container init: exec: "gibtes
+Exitcode: 127
+Name schon vergeben:
+Error: creating container storage: the container name "dopp" is already in use by <ID>
+Programm im Container beendet sich mit Fehler:
+Fehlermeldung
+ExitCode=2

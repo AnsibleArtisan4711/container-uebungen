@@ -1,0 +1,4 @@
+# Befehle (Textdatei, NICHT ausgeführt; Fachwissen, nicht gegen die Dokumentation geprüft)
+podman-compose up -d        # Dienste aus compose.yaml starten (Paket podman-compose)
+podman-compose ps           # Zustand anzeigen
+podman-compose down         # Dienste und Netzwerk entfernen
